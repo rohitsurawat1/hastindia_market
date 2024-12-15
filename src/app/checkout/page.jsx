@@ -7,7 +7,18 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from 'react-hot-toast'
+
+const statesOfIndia = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", 
+  "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", 
+  "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", 
+  "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", 
+  "Lakshadweep", "Delhi", "Puducherry", "Ladakh", "Jammu and Kashmir"
+]
 
 export default function Checkout() {
   const { cart, cartTotal, clearCart } = useCart()
@@ -31,23 +42,17 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Here you would typically send the order details to your server
-    // The server would create an order in Razorpay and return the order ID
-    // For this example, we'll simulate this process
-    
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: cartTotal * 100, // Razorpay expects amount in paise
+      amount: cartTotal * 100,
       currency: "INR",
       name: "HastIndia",
       description: "Purchase from HastIndia",
-      order_id: "order_" + Math.random().toString(36).substr(2, 9), // This should come from your server
+      order_id: "order_" + Math.random().toString(36).substr(2, 9),
       handler: function (response) {
-        // Handle successful payment
         toast.success("Payment successful!")
         clearCart()
         router.push('/order-confirmation')
-        // Here you would typically update your database with the order details
       },
       prefill: {
         name: shippingDetails.name,
@@ -118,19 +123,26 @@ export default function Checkout() {
             </div>
             <div>
               <Label htmlFor="state">State</Label>
-              <Input
-                id="state"
-                name="state"
-                value={shippingDetails.state}
-                onChange={handleInputChange}
-                required
-              />
+              <Select 
+                value={shippingDetails.state} 
+                onValueChange={(value) => setShippingDetails(prev => ({ ...prev, state: value }))}
+              >
+                <SelectTrigger id="state">
+                  <SelectValue placeholder="Select a state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statesOfIndia.map((state, index) => (
+                    <SelectItem key={index} value={state}>{state}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="pincode">Pincode</Label>
               <Input
                 id="pincode"
                 name="pincode"
+                type="number"
                 value={shippingDetails.pincode}
                 onChange={handleInputChange}
                 required
@@ -141,6 +153,7 @@ export default function Checkout() {
               <Input
                 id="phone"
                 name="phone"
+                type="number"
                 value={shippingDetails.phone}
                 onChange={handleInputChange}
                 required
@@ -170,4 +183,3 @@ export default function Checkout() {
     </div>
   )
 }
-

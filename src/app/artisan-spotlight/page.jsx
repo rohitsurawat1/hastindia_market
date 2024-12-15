@@ -95,12 +95,12 @@ export default function ArtisanSpotlight() {
   }
 
   if (loading && artisans.length === 0) {
-    return <div className="container mx-auto px-4 py-8">Loading artisans...</div>
+    return <div className="container mx-auto px-4 py-8 text-[#FFF3DE]">Loading artisans...</div>
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Artisan Spotlight</h1>
+    <div className="container mx-auto px-4 py-8 text-[#FFF3DE]">
+      <h1 className="text-3xl font-bold mb-8 text-[#DC9920]">Artisan Spotlight</h1>
       
       {featuredArtisan && <FeaturedArtisan artisan={featuredArtisan} />}
 
@@ -111,14 +111,15 @@ export default function ArtisanSpotlight() {
             placeholder="Search artisans..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-[#1A3A4F] text-[#FFF3DE] placeholder-[#8B4513]"
           />
         </div>
         <div className="w-full md:w-1/2">
           <Select value={selectedCraft} onValueChange={setSelectedCraft}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-[#1A3A4F] text-[#FFF3DE]">
               <SelectValue placeholder="Filter by craft" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-[#1A3A4F] text-[#FFF3DE]">
               <SelectItem value="all">All Crafts</SelectItem>
               {crafts.map(craft => (
                 <SelectItem key={craft} value={craft}>{craft}</SelectItem>
@@ -129,7 +130,7 @@ export default function ArtisanSpotlight() {
       </div>
 
       {filteredArtisans.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArtisans.map((artisan, index) => (
             <div key={artisan.id} ref={index === filteredArtisans.length - 1 ? lastArtisanRef : null}>
               <ArtisanCard artisan={artisan} />
@@ -137,13 +138,13 @@ export default function ArtisanSpotlight() {
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-700">No artisans found matching your criteria.</p>
+        <p className="text-center text-[#8B4513]">No artisans found matching your criteria.</p>
       )}
 
-      {loading && <p className="text-center mt-4">Loading more artisans...</p>}
+      {loading && <p className="text-center mt-4 text-[#8B4513]">Loading more artisans...</p>}
 
       <Button
-        className="fixed bottom-4 right-4 rounded-full p-2"
+        className="fixed bottom-4 right-4 rounded-full p-2 bg-[#DC9920] text-[#1A3A4F] hover:bg-[#037964] transition-transform transform hover:scale-110"
         onClick={scrollToTop}
         aria-label="Scroll to top"
       >
@@ -152,4 +153,3 @@ export default function ArtisanSpotlight() {
     </div>
   )
 }
-

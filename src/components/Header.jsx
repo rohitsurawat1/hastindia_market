@@ -35,10 +35,10 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b">
+    <header className="bg-[#FFF3DE] border-b border-[#DC9920]">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-primary">
+          <Link href="/" className="text-3xl font-bold text-[#800000]">
             HastIndia
           </Link>
 
@@ -47,55 +47,49 @@ const Header = () => {
               <Input
                 type="text"
                 placeholder="Search for anything"
-                className="w-64 pl-10"
+                className="w-64 pl-10 pr-10 bg-[#FFF3DE] border border-[#DC9920] rounded-full focus:outline-none focus:ring-2 focus:ring-[#037964]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#037964]">
+                <Search />
+              </Button>
             </form>
 
             <nav className="space-x-4">
               <Link
                 href="/shop"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-[#800000] hover:text-[#DC9920] transition-colors"
               >
                 Shop
               </Link>
               <Link
                 href="/artisan-spotlight"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-[#800000] hover:text-[#DC9920] transition-colors"
               >
                 Artisan Spotlight
               </Link>
-              {user && user.role === "seller" && (
-                <Link
-                  href="/seller/dashboard"
-                  className="text-foreground hover:text-primary transition-colors"
-                >
-                  Seller Dashboard
-                </Link>
-              )}
             </nav>
 
             <div className="flex items-center space-x-4">
               <Link
                 href="/wishlist"
-                className="text-foreground hover:text-primary transition-colors relative"
+                className="text-[#800000] hover:text-[#DC9920] transition-colors relative"
               >
                 <Heart className="h-6 w-6" />
                 {totalWishlistItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  <span className="absolute -top-2 -right-2 bg-[#037964] text-[#FFF3DE] rounded-full w-5 h-5 flex items-center justify-center text-xs">
                     {totalWishlistItems}
                   </span>
                 )}
               </Link>
               <Link
                 href="/cart"
-                className="text-foreground hover:text-primary transition-colors relative"
+                className="text-[#800000] hover:text-[#DC9920] transition-colors relative"
               >
                 <ShoppingCart className="h-6 w-6" />
                 {totalCartItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  <span className="absolute -top-2 -right-2 bg-[#037964] text-[#FFF3DE] rounded-full w-5 h-5 flex items-center justify-center text-xs">
                     {totalCartItems}
                   </span>
                 )}
@@ -104,7 +98,7 @@ const Header = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0">
-                      <User className="h-6 w-6 text-foreground hover:text-primary transition-colors" />
+                      <User className="h-6 w-6 text-[#800000] hover:text-[#DC9920] transition-colors" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -145,53 +139,45 @@ const Header = () => {
               <nav className="flex flex-col space-y-4">
                 <Link
                   href="/shop"
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-[#800000] hover:text-[#DC9920] transition-colors"
                 >
                   Shop
                 </Link>
                 <Link
                   href="/artisan-spotlight"
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-[#800000] hover:text-[#DC9920] transition-colors"
                 >
                   Artisan Spotlight
                 </Link>
                 <Link
                   href="/wishlist"
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-[#800000] hover:text-[#DC9920] transition-colors"
                 >
                   Wishlist
                 </Link>
                 <Link
                   href="/cart"
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-[#800000] hover:text-[#DC9920] transition-colors"
                 >
                   Cart
                 </Link>
-                {user && user.role === "seller" && (
-                  <Link
-                    href="/seller/dashboard"
-                    className="text-foreground hover:text-primary transition-colors"
-                  >
-                    Seller Dashboard
-                  </Link>
-                )}
                 {user ? (
                   <>
                     <Link
                       href="/profile"
-                      className="text-foreground hover:text-primary transition-colors"
+                      className="text-[#800000] hover:text-[#DC9920] transition-colors"
                     >
                       Your Profile
                     </Link>
                     <Link
                       href="/orders"
-                      className="text-foreground hover:text-primary transition-colors"
+                      className="text-[#800000] hover:text-[#DC9920] transition-colors"
                     >
                       Your Orders
                     </Link>
                     <button
                       onClick={signOut}
-                      className="text-foreground hover:text-primary transition-colors text-left"
+                      className="text-[#800000] hover:text-[#DC9920] transition-colors text-left"
                     >
                       Sign Out
                     </button>
@@ -200,13 +186,13 @@ const Header = () => {
                   <>
                     <Link
                       href="/login"
-                      className="text-foreground hover:text-primary transition-colors"
+                      className="text-[#800000] hover:text-[#DC9920] transition-colors"
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/register"
-                      className="text-foreground hover:text-primary transition-colors"
+                      className="text-[#800000] hover:text-[#DC9920] transition-colors"
                     >
                       Register
                     </Link>
