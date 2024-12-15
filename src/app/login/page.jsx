@@ -1,42 +1,45 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from 'react-hot-toast'
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "react-hot-toast";
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const { signIn, signInWithGoogle } = useAuth()
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { signIn, signInWithGoogle } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      await signIn(email, password)
-      toast.success('Logged in successfully')
-      router.push('/') // Redirect to home page after successful login
-    } catch (error) {
-      console.error('Login error:', error)
-      toast.error('Failed to log in. Please check your credentials.')
-    }
-  }
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      try {
+        await signIn(email, password);
+        toast.success("Logged in successfully");
+        router.push("/"); // Redirect to home page after successful login
+      } catch (error) {
+        console.error("Login error:", error);
+        toast.error("Failed to log in. Please check your credentials.");
+      }
+    },
+    [email, password, signIn, router]
+  );
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     try {
-      await signInWithGoogle()
-      toast.success('Logged in successfully with Google')
-      router.push('/')
+      await signInWithGoogle();
+      toast.success("Logged in successfully with Google");
+      router.push("/");
     } catch (error) {
-      console.error('Google sign-in error:', error)
-      toast.error('Failed to log in with Google')
+      console.error("Google sign-in error:", error);
+      toast.error("Failed to log in with Google.");
     }
-  }
+  }, [signInWithGoogle, router]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,23 +66,36 @@ export default function Login() {
               required
             />
           </div>
-          <Button type="submit" className="w-full">Log In</Button>
+          <Button type="submit" className="w-full">
+            Log In
+          </Button>
         </form>
         <div className="mt-4">
-          <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="outline"
+            className="w-full"
+          >
             Sign in with Google
           </Button>
         </div>
         <div className="mt-4 text-center">
-          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Forgot password?
           </Link>
         </div>
         <div className="mt-6 text-center">
-          <p>Don't have an account? <Link href="/register" className="text-blue-600 hover:underline">Register here</Link></p>
+          <p>
+            Don&rsquo;t have an account?{" "}
+            <Link href="/register" className="text-blue-600 hover:underline">
+              Register here
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

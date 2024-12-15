@@ -1,101 +1,139 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { db } from '@/lib/firebase'
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import SellerProductList from "@/components/seller/SellerProductList";
+import SellerOrderList from "@/components/seller/SellerOrderList";
+import SellerAnalytics from "@/components/seller/SellerAnalytics";
 
 export default function SellerDashboard() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState({
     totalSales: 0,
     totalOrders: 0,
     totalProducts: 0,
     recentOrders: [],
-    salesData: []
-  })
+    salesData: [],
+  });
 
   useEffect(() => {
     if (!user) {
-      router.push('/login');
-    } else if (user.role !== 'seller') {
-      router.push('/');
+      router.push("/login");
+    } else if (user.role !== "seller") {
+      router.push("/");
     } else {
-      setLoading(false);
+      fetchDashboardData();
     }
   }, [user, router]);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (user) {
-        try {
-          // Fetch total sales and orders
-          const ordersQuery = query(collection(db, 'orders'), where('sellerId', '==', user.uid))
-          const ordersSnapshot = await getDocs(ordersQuery)
-          const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-          const totalSales = orders.reduce((sum, order) => sum + order.total, 0)
-          const totalOrders = orders.length
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-          // Fetch total products
-          const productsQuery = query(collection(db, 'products'), where('sellerId', '==', user.uid))
-          const productsSnapshot = await getDocs(productsQuery)
-          const totalProducts = productsSnapshot.size
-
-          // Fetch recent orders
-          const recentOrdersQuery = query(
-            collection(db, 'orders'),
-            where('sellerId', '==', user.uid),
-            orderBy('createdAt', 'desc'),
-            limit(5)
+      const [ordersSnapshot, productsSnapshot] = await Promise.all([
+        getDocs(
+          query(
+            collection(db, "orders"),
+            where("sellerId", "==", user.uid),
+            orderBy("createdAt", "desc"),
+            limit(100) // Limit to last 100 orders for performance
           )
-          const recentOrdersSnapshot = await getDocs(recentOrdersQuery)
-          const recentOrders = recentOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        ),
+        getDocs(
+          query(collection(db, "products"), where("sellerId", "==", user.uid))
+        ),
+      ]);
 
-          // Prepare sales data for chart
-          const salesData = orders.reduce((acc, order) => {
-            const date = new Date(order.createdAt.seconds * 1000).toLocaleDateString()
-            const existingEntry = acc.find(entry => entry.date === date)
-            if (existingEntry) {
-              existingEntry.sales += order.total
-            } else {
-              acc.push({ date, sales: order.total })
-            }
-            return acc
-          }, [])
+      const orders = ordersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+      const totalOrders = orders.length;
+      const totalProducts = productsSnapshot.size;
+      const recentOrders = orders.slice(0, 5);
 
-          setDashboardData({
-            totalSales,
-            totalOrders,
-            totalProducts,
-            recentOrders,
-            salesData
-          })
-        } catch (error) {
-          console.error('Error fetching dashboard data:', error)
+      const salesData = orders.reduce((acc, order) => {
+        const date = new Date(
+          order.createdAt.seconds * 1000
+        ).toLocaleDateString();
+        const existingEntry = acc.find((entry) => entry.date === date);
+        if (existingEntry) {
+          existingEntry.sales += order.total;
+        } else {
+          acc.push({ date, sales: order.total });
         }
-      }
-    }
+        return acc;
+      }, []);
 
-    fetchDashboardData()
-  }, [user])
+      setDashboardData({
+        totalSales,
+        totalOrders,
+        totalProducts,
+        recentOrders,
+        salesData,
+      });
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError("Failed to load dashboard data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const memoizedSalesChart = useMemo(
+    () => (
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={dashboardData.salesData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="sales" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    ),
+    [dashboardData.salesData]
+  );
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading dashboard...</div>;
   }
 
-  if (!user || user.role !== 'seller') {
-    return null;
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Seller Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
@@ -103,7 +141,9 @@ export default function SellerDashboard() {
             <CardTitle>Total Sales</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">₹{dashboardData.totalSales.toFixed(2)}</p>
+            <p className="text-3xl font-bold">
+              ₹{dashboardData.totalSales.toFixed(2)}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -129,15 +169,7 @@ export default function SellerDashboard() {
             <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul>
-              {dashboardData.recentOrders.map(order => (
-                <li key={order.id} className="mb-2">
-                  <Link href={`/seller/orders/${order.id}`} className="text-blue-600 hover:underline">
-                    Order #{order.id.slice(-6)} - ₹{order.total.toFixed(2)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <SellerOrderList orders={dashboardData.recentOrders} />
             <Button asChild className="mt-4">
               <Link href="/seller/orders">View All Orders</Link>
             </Button>
@@ -147,21 +179,9 @@ export default function SellerDashboard() {
           <CardHeader>
             <CardTitle>Sales Overview</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dashboardData.salesData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="sales" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
+          <CardContent>{memoizedSalesChart}</CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

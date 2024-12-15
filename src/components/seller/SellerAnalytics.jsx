@@ -1,36 +1,57 @@
-import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useMemo } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SellerAnalytics({ orders }) {
-  const [timeFrame, setTimeFrame] = useState('weekly')
+  const [timeFrame, setTimeFrame] = useState("weekly");
 
-  const prepareChartData = () => {
-    const now = new Date()
+  const chartData = useMemo(() => {
+    const now = new Date();
     const timeFrames = {
       weekly: 7,
       monthly: 30,
-      yearly: 365
-    }
-    const daysToShow = timeFrames[timeFrame]
+      yearly: 365,
+    };
+    const daysToShow = timeFrames[timeFrame];
 
-    const salesByDay = {}
+    const salesByDay = {};
     for (let i = 0; i < daysToShow; i++) {
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i)
-      salesByDay[date.toISOString().split('T')[0]] = 0
+      const date = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - i
+      );
+      salesByDay[date.toISOString().split("T")[0]] = 0;
     }
 
-    orders.forEach(order => {
-      const orderDate = new Date(order.createdAt.seconds * 1000).toISOString().split('T')[0]
+    orders.forEach((order) => {
+      const orderDate = new Date(order.createdAt.seconds * 1000)
+        .toISOString()
+        .split("T")[0];
       if (salesByDay.hasOwnProperty(orderDate)) {
-        salesByDay[orderDate] += order.total
+        salesByDay[orderDate] += order.total;
       }
-    })
+    });
 
-    return Object.entries(salesByDay).map(([date, sales]) => ({ date, sales })).reverse()
-  }
-
-  const chartData = prepareChartData()
+    return Object.entries(salesByDay)
+      .map(([date, sales]) => ({ date, sales }))
+      .reverse();
+  }, [orders, timeFrame]);
 
   return (
     <div>
@@ -57,6 +78,5 @@ export default function SellerAnalytics({ orders }) {
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
-

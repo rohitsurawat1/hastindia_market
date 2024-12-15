@@ -1,5 +1,12 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export default function SellerOrderList({ orders }) {
   return (
@@ -16,7 +23,9 @@ export default function SellerOrderList({ orders }) {
         {orders.map((order) => (
           <TableRow key={order.id}>
             <TableCell>{order.id.slice(0, 8)}</TableCell>
-            <TableCell>{new Date(order.createdAt.seconds * 1000).toLocaleDateString()}</TableCell>
+            <TableCell>
+              {new Date(order.createdAt.seconds * 1000).toLocaleDateString()}
+            </TableCell>
             <TableCell>₹{order.total.toFixed(2)}</TableCell>
             <TableCell>
               <OrderStatusBadge status={order.status} />
@@ -25,7 +34,7 @@ export default function SellerOrderList({ orders }) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
 
 function OrderStatusBadge({ status }) {
@@ -35,12 +44,7 @@ function OrderStatusBadge({ status }) {
     shipped: "bg-green-100 text-green-800",
     delivered: "bg-purple-100 text-purple-800",
     cancelled: "bg-red-100 text-red-800",
-  }
+  };
 
-  return (
-    <Badge className={statusColors[status.toLowerCase()]}>
-      {status}
-    </Badge>
-  )
+  return <Badge className={statusColors[status.toLowerCase()]}>{status}</Badge>;
 }
-
