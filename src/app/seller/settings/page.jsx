@@ -1,62 +1,62 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { db } from '@/lib/firebase'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from 'react-hot-toast'
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-hot-toast";
 
 export default function SellerSettings() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [sellerInfo, setSellerInfo] = useState({
-    businessName: '',
-    description: '',
-    contactEmail: '',
-    contactPhone: '',
-    address: '',
-    bankAccountName: '',
-    bankAccountNumber: '',
-    bankName: '',
-    ifscCode: '',
-  })
+    businessName: "",
+    description: "",
+    contactEmail: "",
+    contactPhone: "",
+    address: "",
+    bankAccountName: "",
+    bankAccountNumber: "",
+    bankName: "",
+    ifscCode: "",
+  });
 
   useEffect(() => {
     if (user) {
-      fetchSellerInfo()
+      fetchSellerInfo();
     }
-  }, [user])
+  }, [user]);
 
   const fetchSellerInfo = async () => {
     try {
-      const sellerDoc = await getDoc(doc(db, 'sellers', user.uid))
+      const sellerDoc = await getDoc(doc(db, "sellers", user.uid));
       if (sellerDoc.exists()) {
-        setSellerInfo(sellerDoc.data())
+        setSellerInfo(sellerDoc.data());
       }
     } catch (error) {
-      console.error('Error fetching seller info:', error)
-      toast.error('Failed to fetch seller information')
+      console.error("Error fetching seller info:", error);
+      toast.error("Failed to fetch seller information");
     }
-  }
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setSellerInfo(prevInfo => ({ ...prevInfo, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setSellerInfo((prevInfo) => ({ ...prevInfo, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await updateDoc(doc(db, 'sellers', user.uid), sellerInfo)
-      toast.success('Seller information updated successfully')
+      await updateDoc(doc(db, "sellers", user.uid), sellerInfo);
+      toast.success("Seller information updated successfully");
     } catch (error) {
-      console.error('Error updating seller info:', error)
-      toast.error('Failed to update seller information')
+      console.error("Error updating seller info:", error);
+      toast.error("Failed to update seller information");
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -170,6 +170,5 @@ export default function SellerSettings() {
         <Button type="submit">Save Changes</Button>
       </form>
     </div>
-  )
+  );
 }
-
